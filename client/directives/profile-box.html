@@ -1,0 +1,17 @@
+<div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
+	<div class="panel panel-default" ng-controller="UserController">
+		<div class="panel-body" ng-controller="TweetController">
+			<div class="row">
+				<div class="col-md-6 col-xs-12">
+					<!--profile picture-->
+					<img ng-src="/images/{{user.image}}" class="img-thumbnail img-responsive">
+				</div>
+				<div class="col-md-6 col-xs-12">
+				  	<span><strong><p>{{user.name}}</p></strong></span>
+				    <span><p>@{{user.username}}</p></span>
+				    <span><p>Tweets {{countTweets}}</p></span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
