@@ -9,6 +9,7 @@ var gulp=require('gulp'),
 	browserSync=require('browser-sync').create(),
 	reload=browserSync.reload,
 	nodemon=require('gulp-nodemon'),
+	concat=require('gulp-concat'),
 	minify=require('gulp-minify-css');
 
 ///////////////////////////////////////////
@@ -16,33 +17,37 @@ var gulp=require('gulp'),
 //////////////////////////////////////////
 
 gulp.task('html',function(){
-	gulp.src('./client/**/*.html')
+	return gulp.src('./client/**/*.html')
 	.pipe(reload({stream:true}));
 });
 
 ///////////////////////////////////////////
-// Scripts Task
+// Scripts Task - concat and uglify
 //////////////////////////////////////////
 
 gulp.task('scripts',function(){
-	gulp.src(['./client/**/*.js','!client/**/*min.js'])
+	return gulp.src(['./client/**/*.js','!client/**/*min.js','!client/helpers/*.js'])
 		.pipe(plumber())
-		.pipe(rename({suffix:'.min'}))
+		.pipe(concat('app.js'))
+		.pipe(gulp.dest('./client/builds'))
+		.pipe(rename('app.min.js'))
 		.pipe(uglify())
-		.pipe(gulp.dest('./client/'))
+		.pipe(gulp.dest('./client/builds'))
 		.pipe(reload({stream:true}));
 });
 
 ///////////////////////////////////////////
-// Styles Task
+// Styles Task - concat and minify
 //////////////////////////////////////////
 
 gulp.task('styles',function(){
-	gulp.src(['./client/styles/*.css','!client/styles/*min.css'])
+	return gulp.src(['./client/styles/*.css','!client/styles/*min.css'])
 		.pipe(plumber())
-		.pipe(rename({suffix:'.min'}))
+		.pipe(concat('styles.css'))
+		.pipe(gulp.dest('./client/builds'))
+		.pipe(rename('styles.min.css'))
 		.pipe(minify())
-		.pipe(gulp.dest('./client/styles/'))
+		.pipe(gulp.dest('./client/builds'))
 		.pipe(reload({stream:true}));
 });
 
