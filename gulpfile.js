@@ -26,10 +26,10 @@ gulp.task('html',function(){
 //////////////////////////////////////////
 
 gulp.task('scripts',function(){
-	return gulp.src(['./client/**/*.js','!client/**/*min.js','!client/helpers/*.js'])
+	return gulp.src(['./client/**/*.js','!client/**/*min.js','!client/helpers/*.js','!client/builds/*'])
 		.pipe(plumber())
 		.pipe(concat('app.js'))
-		.pipe(gulp.dest('./client/builds'))
+		.pipe(gulp.dest('./client/builds',{overwrite: true}))
 		.pipe(rename('app.min.js'))
 		.pipe(uglify())
 		.pipe(gulp.dest('./client/builds'))
@@ -41,10 +41,10 @@ gulp.task('scripts',function(){
 //////////////////////////////////////////
 
 gulp.task('styles',function(){
-	return gulp.src(['./client/styles/*.css','!client/styles/*min.css'])
+	return gulp.src(['./client/styles/*.css','!client/styles/*min.css','!client/builds/*'])
 		.pipe(plumber())
 		.pipe(concat('styles.css'))
-		.pipe(gulp.dest('./client/builds'))
+		.pipe(gulp.dest('./client/builds',{overwrite: true}))
 		.pipe(rename('styles.min.css'))
 		.pipe(minify())
 		.pipe(gulp.dest('./client/builds'))
@@ -72,7 +72,7 @@ gulp.task('nodemon',[], function (cb) {
 	var started = false;
 	
 	return nodemon({
-		script: './server/server.js',
+		script: './server/bin/www',
 		watch:['./*.*']
 	}).on('start', function () {
 		// to avoid nodemon being started multiple times
@@ -81,7 +81,7 @@ gulp.task('nodemon',[], function (cb) {
 		} 
 		started = true; 
 	}).on('restart',function(){
-		seTimeout(function(){
+		setTimeout(function(){
 			reload();
 		},200);
 	});
