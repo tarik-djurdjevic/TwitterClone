@@ -1,27 +1,32 @@
-var userId="5ad29c04a55cc219f01add5d";//hard coded because we don't have authentication
-angular.module('myApp').controller('TweetController', ['$scope','$http',function($scope,$http) {
+
+angular.module('myApp').controller('TweetController', ['$scope','$http','User',function($scope,$http,User) {
+  $scope.user=User.user;
   var Refresh=function(){
-    $http({
-    url: '/tweets', 
+  console.log($scope.user._id);
+  $http({
+    url: '/tweets',
     method: "GET",
-    params: {id: userId}
-    }).then(function(response){
-      $scope.countTweets=response.data.obj.count;
-      console.log($scope.countTweets);
-      $scope.tweets=response.data.obj.tweets;
-      for (index = 0; index < $scope.countTweets;index++) {
-        $scope.tweets[index].createdOn=timeago().format($scope.tweets[index].createdOn);
-      }
-    });
-    
-    $scope.tweet={value:''};
+    params: {id: $scope.user._id}
+  }).then(function(response){
+    $scope.data={
+      countTweets:response.data.obj.count,
+      tweets:response.data.obj.tweets
+    };
+    for (index = 0; index < $scope.data.countTweets;index++) {
+      $scope.data.tweets[index].createdOn=timeago().format(response.data.obj.tweets[index].createdOn);
+    }
+    console.log($scope.data.tweets);
+  });
+
+  $scope.tweet={value:''};
   };
-  Refresh();//initial get
+  setTimeout(Refresh,100)//initial get with little delay to fetch $scope.user
+  
   $scope.addTweet=function(){
       $http({
         url: '/tweets', 
         method: "POST",
-        params: {id: userId},
+        params: {id: $scope.user._id},
         data:{tweet:$scope.tweet}
       }).then(function(response){
         //clear the input field and update tweets

@@ -1,28 +1,33 @@
 var myApp = angular.module('myApp',[]);
-var userId="5ad29c04a55cc219f01add5d";//hard coded because we don't have authentication
-angular.module('myApp').controller('TweetController', ['$scope','$http',function($scope,$http) {
+
+angular.module('myApp').controller('TweetController', ['$scope','$http','User',function($scope,$http,User) {
+  $scope.user=User.user;
   var Refresh=function(){
-    $http({
-    url: '/tweets', 
+  console.log($scope.user._id);
+  $http({
+    url: '/tweets',
     method: "GET",
-    params: {id: userId}
-    }).then(function(response){
-      $scope.countTweets=response.data.obj.count;
-      console.log($scope.countTweets);
-      $scope.tweets=response.data.obj.tweets;
-      for (index = 0; index < $scope.countTweets;index++) {
-        $scope.tweets[index].createdOn=timeago().format($scope.tweets[index].createdOn);
-      }
-    });
-    
-    $scope.tweet={value:''};
+    params: {id: $scope.user._id}
+  }).then(function(response){
+    $scope.data={
+      countTweets:response.data.obj.count,
+      tweets:response.data.obj.tweets
+    };
+    for (index = 0; index < $scope.data.countTweets;index++) {
+      $scope.data.tweets[index].createdOn=timeago().format(response.data.obj.tweets[index].createdOn);
+    }
+    console.log($scope.data.tweets);
+  });
+
+  $scope.tweet={value:''};
   };
-  Refresh();//initial get
+  setTimeout(Refresh,100)//initial get with little delay to fetch $scope.user
+  
   $scope.addTweet=function(){
       $http({
         url: '/tweets', 
         method: "POST",
-        params: {id: userId},
+        params: {id: $scope.user._id},
         data:{tweet:$scope.tweet}
       }).then(function(response){
         //clear the input field and update tweets
@@ -35,15 +40,53 @@ angular.module('myApp').controller('TweetController', ['$scope','$http',function
     });
   };
 }]);
-var User={
-  name:"Tarik Djurdjevic",
-  username:"tarik.djurdjevic",
-  image:"avatar.png"
+var Usr={
+	firstName:"Tarik",
+	lastName:"Djurdjevic",
+	username:"tarik.djurdjevic",
+	profilePicture:"avatar.png"
 };
+//persist user between controllers
+angular.module('myApp').factory('User', function(){
 
-angular.module('myApp').controller('UserController', ['$scope',function($scope) {
-  $scope.user=User;
+    var service = {
+        user:{},
+        set:function(usr){
+            angular.copy(usr, service.user);
+        },
+        get:function(){
+          return this.user;
+        }
+    };
+    return service;
+});
+angular.module('myApp').controller('UserController', ['$http','$scope','User',function($http,$scope,User) {
+	$scope.index=0;//if you want to switch users just change value here
+  $scope.user=User.user;
+  $http({
+      url: '/user', 
+      method: "GET"
+    }).then(function(response){
+      if(response.data.obj.count===0){
+        $http({
+        url: '/user', 
+        method: "POST",
+        data:{user:Usr}
+        }).then(function(response){
+          $scope.user=response.data.obj.users[$scope.index];
+          User.set($scope.user);
+        });
+      }
+      else if($scope.index>response.data.obj.count)
+        console.log("Not valid index of user");
+      else{
+        $scope.user=response.data.obj.users[$scope.index];
+        User.set($scope.user);
+      }
+      
+    });
 }]);
+
 angular.module('myApp').directive("profileBox", function() {
     return {
         restrict : "E",

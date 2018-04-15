@@ -4,12 +4,12 @@
 			<div class="row">
 				<div class="col-md-6 col-xs-12">
 					<!--profile picture-->
-					<img ng-src="/images/{{user.image}}" class="img-thumbnail img-responsive">
+					<img ng-src="/images/{{user.profilePicture}}" class="img-thumbnail img-responsive">
 				</div>
 				<div class="col-md-6 col-xs-12">
-				  	<span><strong><p>{{user.name}}</p></strong></span>
+				  	<span><strong><p>{{user.firstName + " " + user.lastName}}</p></strong></span>
 				    <span><p>@{{user.username}}</p></span>
-				    <span><p>Tweets {{countTweets}}</p></span>
+				    <span><p>Tweets {{data.countTweets}}</p></span>
 				</div>
 			</div>
 		</div>

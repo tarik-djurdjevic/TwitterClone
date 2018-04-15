@@ -7,6 +7,7 @@ var Tweets = require('../models/tweets');
 
 router.get('/', function (req, res, next) {
     Tweets.find({'user': req.query.id})
+        .sort({createdOn:-1})
         .exec(function (err, docs) {
             if (err) {
                 return res.status(500).json({
